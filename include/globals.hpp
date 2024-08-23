@@ -4,6 +4,7 @@
 #include <string>
 #include <array>
 #include "types.hpp"
+#include "magics.hpp"
 
 namespace G {
     // default fen / position
@@ -46,34 +47,34 @@ namespace G {
     }
     constexpr std::array<std::array<int, NSQUARES>, NSQUARES> DISTANCE = generateDistance();
 
-    // constexpr std::array<std::array<U64, NSQUARES>, NSQUARES> generateBitsBetween() {
-    //     std::array<std::array<U64, NSQUARES>, NSQUARES> table = {};
+    constexpr std::array<std::array<U64, NSQUARES>, NSQUARES> generateBitsBetween() {
+        std::array<std::array<U64, NSQUARES>, NSQUARES> table = {};
 
-    //     for (int i = 0; i < NSQUARES; ++i) {
-    //         Square sq1 = static_cast<Square>(i);
-    //         for (int j = 0; j < NSQUARES; ++j) {
-    //             Square sq2 = static_cast<Square>(j);
-    //             if (Magic::getBishopAttacks(sq1, 0) & BITSET[sq2]) {
-    //                 table[sq1][sq2] = (
-    //                     Magic::getBishopAttacks(sq1, BITSET[sq2])
-    //                     & Magic::getBishopAttacks(sq2, BITSET[sq1])
-    //                 );
-    //             }
+        for (int i = 0; i < NSQUARES; ++i) {
+            Square sq1 = static_cast<Square>(i);
+            for (int j = 0; j < NSQUARES; ++j) {
+                Square sq2 = static_cast<Square>(j);
+                if (Magic::getBishopAttacks(sq1, 0) & BITSET[sq2]) {
+                    table[sq1][sq2] = (
+                        Magic::getBishopAttacks(sq1, BITSET[sq2])
+                        & Magic::getBishopAttacks(sq2, BITSET[sq1])
+                    );
+                }
 
-    //             if (Magic::getRookAttacks(sq1, 0) & BITSET[sq2]) {
-    //                 table[sq1][sq2] = (
-    //                     Magic::getRookAttacks(sq1, BITSET[sq2])
-    //                     & Magic::getRookAttacks(sq2, BITSET[sq1])
-    //                 );
-    //             }
-    //         }
-    //     }
+                if (Magic::getRookAttacks(sq1, 0) & BITSET[sq2]) {
+                    table[sq1][sq2] = (
+                        Magic::getRookAttacks(sq1, BITSET[sq2])
+                        & Magic::getRookAttacks(sq2, BITSET[sq1])
+                    );
+                }
+            }
+        }
 
-    //     return table;
-    // }
-    // constexpr std::array<std::array<U64, NSQUARES>, NSQUARES> BITS_BETWEEN = generateBitsBetween();
+        return table;
+    }
+    constexpr std::array<std::array<U64, NSQUARES>, NSQUARES> BITS_BETWEEN = generateBitsBetween();
 
-    extern U64 BITS_BETWEEN[][64];
+    // extern U64 BITS_BETWEEN[][64];
     extern U64 BITS_INLINE[][64];
 
     constexpr void addTarget(Square orig, File targetFile, Rank targetRank, std::array<U64, 64>& arr) {

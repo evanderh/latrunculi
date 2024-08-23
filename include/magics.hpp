@@ -1,8 +1,6 @@
 #ifndef ANTONIUS_MAGICS_H
 #define ANTONIUS_MAGICS_H
 
-#include "types.hpp"
-
 /**
  * Modified implementation of magic bitboards for Latrunculi
  * All credit goes to Pradyumna Kannan
@@ -33,42 +31,21 @@
 
 namespace Magic
 {
-    extern U64 rookAttacksDB[102400];
+    using U64 = uint64_t;
 
-    constexpr U64* rookAttacks[64] = {
-        rookAttacksDB + 86016, rookAttacksDB + 73728,
-        rookAttacksDB + 36864, rookAttacksDB + 43008,
-        rookAttacksDB + 47104, rookAttacksDB + 51200,
-        rookAttacksDB + 77824, rookAttacksDB + 94208,
-        rookAttacksDB + 69632, rookAttacksDB + 32768,
-        rookAttacksDB + 38912, rookAttacksDB + 10240,
-        rookAttacksDB + 14336, rookAttacksDB + 53248,
-        rookAttacksDB + 57344, rookAttacksDB + 81920,
-        rookAttacksDB + 24576, rookAttacksDB + 33792,
-        rookAttacksDB + 6144, rookAttacksDB + 11264,
-        rookAttacksDB + 15360, rookAttacksDB + 18432,
-        rookAttacksDB + 58368, rookAttacksDB + 61440,
-        rookAttacksDB + 26624, rookAttacksDB + 4096,
-        rookAttacksDB + 7168, rookAttacksDB + 0,
-        rookAttacksDB + 2048, rookAttacksDB + 19456,
-        rookAttacksDB + 22528, rookAttacksDB + 63488,
-        rookAttacksDB + 28672, rookAttacksDB + 5120,
-        rookAttacksDB + 8192, rookAttacksDB + 1024,
-        rookAttacksDB + 3072, rookAttacksDB + 20480,
-        rookAttacksDB + 23552, rookAttacksDB + 65536,
-        rookAttacksDB + 30720, rookAttacksDB + 34816,
-        rookAttacksDB + 9216, rookAttacksDB + 12288,
-        rookAttacksDB + 16384, rookAttacksDB + 21504,
-        rookAttacksDB + 59392, rookAttacksDB + 67584,
-        rookAttacksDB + 71680, rookAttacksDB + 35840,
-        rookAttacksDB + 39936, rookAttacksDB + 13312,
-        rookAttacksDB + 17408, rookAttacksDB + 54272,
-        rookAttacksDB + 60416, rookAttacksDB + 83968,
-        rookAttacksDB + 90112, rookAttacksDB + 75776,
-        rookAttacksDB + 40960, rookAttacksDB + 45056,
-        rookAttacksDB + 49152, rookAttacksDB + 55296,
-        rookAttacksDB + 79872, rookAttacksDB + 98304
-    };
+    constexpr int LSB(U64 bitboard) {
+        // If the bitboard is zero, return an invalid index (-1 or similar)
+        if (bitboard == 0) return -1;
+
+        // Count the number of trailing zeros to find the position of the LSB
+        int position = 0;
+        while ((bitboard & 1) == 0) {
+            bitboard >>= 1;
+            ++position;
+        }
+        return position;
+    }
+
     constexpr U64 rookMagicNum[64] = {
         0x0080001020400080ull, 0x0040001000200040ull, 0x0080081000200080ull,
         0x0080040800100080ull, 0x0080020400080080ull, 0x0080010200040080ull,
@@ -127,42 +104,15 @@ namespace Magic
         53, 54, 54, 54, 54, 54, 54, 53,
         53, 54, 54, 53, 53, 53, 53, 53
     };
-
-    extern U64 bishopAttacksDB[5248];
-
-    constexpr U64* bishopAttacks[64] = {
-        bishopAttacksDB + 4992, bishopAttacksDB + 2624,
-        bishopAttacksDB + 256, bishopAttacksDB + 896,
-        bishopAttacksDB + 1280, bishopAttacksDB + 1664,
-        bishopAttacksDB + 4800, bishopAttacksDB + 5120,
-        bishopAttacksDB + 2560, bishopAttacksDB + 2656,
-        bishopAttacksDB + 288, bishopAttacksDB + 928,
-        bishopAttacksDB + 1312, bishopAttacksDB + 1696,
-        bishopAttacksDB + 4832, bishopAttacksDB + 4928,
-        bishopAttacksDB + 0, bishopAttacksDB + 128,
-        bishopAttacksDB + 320, bishopAttacksDB + 960,
-        bishopAttacksDB + 1344, bishopAttacksDB + 1728,
-        bishopAttacksDB + 2304, bishopAttacksDB + 2432,
-        bishopAttacksDB + 32, bishopAttacksDB + 160,
-        bishopAttacksDB + 448, bishopAttacksDB + 2752,
-        bishopAttacksDB + 3776, bishopAttacksDB + 1856,
-        bishopAttacksDB + 2336, bishopAttacksDB + 2464,
-        bishopAttacksDB + 64, bishopAttacksDB + 192,
-        bishopAttacksDB + 576, bishopAttacksDB + 3264,
-        bishopAttacksDB + 4288, bishopAttacksDB + 1984,
-        bishopAttacksDB + 2368, bishopAttacksDB + 2496,
-        bishopAttacksDB + 96, bishopAttacksDB + 224,
-        bishopAttacksDB + 704, bishopAttacksDB + 1088,
-        bishopAttacksDB + 1472, bishopAttacksDB + 2112,
-        bishopAttacksDB + 2400, bishopAttacksDB + 2528,
-        bishopAttacksDB + 2592, bishopAttacksDB + 2688,
-        bishopAttacksDB + 832, bishopAttacksDB + 1216,
-        bishopAttacksDB + 1600, bishopAttacksDB + 2240,
-        bishopAttacksDB + 4864, bishopAttacksDB + 4960,
-        bishopAttacksDB + 5056, bishopAttacksDB + 2720,
-        bishopAttacksDB + 864, bishopAttacksDB + 1248,
-        bishopAttacksDB + 1632, bishopAttacksDB + 2272,
-        bishopAttacksDB + 4896, bishopAttacksDB + 5184
+    constexpr int rookMagicOffset[64] = {
+        86016, 73728, 36864, 43008, 47104, 51200, 77824, 94208,
+        69632, 32768, 38912, 10240, 14336, 53248, 57344, 81920,
+        24576, 33792,  6144, 11264, 15360, 18432, 58368, 61440,
+        26624,  4096,  7168,     0,  2048, 19456, 22528, 63488,
+        28672,  5120,  8192,  1024,  3072, 20480, 23552, 65536,
+        30720, 34816,  9216, 12288, 16384, 21504, 59392, 67584,
+        71680, 35840, 39936, 13312, 17408, 54272, 60416, 83968,
+        90112, 75776, 40960, 45056, 49152, 55296, 79872, 98304
     };
 
     constexpr U64 bishopMagicNum[64] = {
@@ -189,7 +139,6 @@ namespace Magic
         0x0000000010020200ull, 0x0000000404080200ull, 0x0000040404040400ull,
         0x0002020202020200ull
     };
-
     constexpr U64 bishopMagicMask[64] = {
         0x0040201008040200ull, 0x0000402010080400ull, 0x0000004020100A00ull,
         0x0000000040221400ull, 0x0000000002442800ull, 0x0000000204085000ull,
@@ -214,7 +163,6 @@ namespace Magic
         0x0028440200000000ull, 0x0050080402000000ull, 0x0020100804020000ull,
         0x0040201008040200ull
 	};
-
     constexpr int bishopMagicShift[64] = {
         58, 59, 59, 59, 59, 59, 59, 58,
         59, 59, 59, 59, 59, 59, 59, 59,
@@ -225,14 +173,211 @@ namespace Magic
         59, 59, 59, 59, 59, 59, 59, 59,
         58, 59, 59, 59, 59, 59, 59, 58
     };
+    constexpr int bishopMagicOffset[64] = {
+        4992,  2624,  256,  896,   1280,  1664,  4800,  5120,
+        2560,  2656,  288,  928,   1312,  1696,  4832,  4928,
+        0,     128,   320,  960,   1344,  1728,  2304,  2432,
+        32,    160,   448,  2752,  3776,  1856,  2336,  2464,
+        64,    192,   576,  3264,  4288,  1984,  2368,  2496,
+        96,    224,   704,  1088,  1472,  2112,  2400,  2528,
+        2592,  2688,  832,  1216,  1600,  2240,  4864,  4960,
+        5056,  2720,  864,  1248,  1632,  2272,  4896,  5184
+    };
+
+    // Translates line occupancy into an occupied-square bitboard
+    constexpr U64 init_occupied(int* squares, int numSquares, U64 line_occupied) {
+        int i = 0;
+        U64 ret = 0;
+
+        for (i = 0; i < numSquares; i++)
+            if (line_occupied & (U64) 1 << i)
+            ret |= (U64) 1 << squares[i];
+        return ret;
+    }
+
+    constexpr U64 init_magic_rook(int square, U64 occupied) {
+        U64 ret = 0;
+        U64 bit;
+        U64 rowbits = (U64) 0xFF << 8 * (square / 8);
+
+        bit = (U64) 1 << square;
+        do {
+            bit <<= 8;
+            ret |= bit;
+        } while (bit && !(bit & occupied));
+
+        bit = (U64) 1 << square;
+        do {
+            bit >>= 8;
+            ret |= bit;
+        } while (bit && !(bit & occupied));
+
+        bit = (U64) 1 << square;
+        do {
+            bit <<= 1;
+            if (bit & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (!(bit & occupied));
+
+        bit = (U64) 1 << square;
+        do {
+            bit >>= 1;
+            if (bit & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (!(bit & occupied));
+
+        return ret;
+    }
+
+    constexpr std::array<U64, 102400> generateRookAttacksDB() {
+        std::array<U64, 102400> table = {};
+        std::array<U64*, 64> pointer = {};
+
+        for (int i = 0; i < 64; ++i) {
+            pointer[i] = table.data() + rookMagicOffset[i];
+        }
+
+        // Pre-calculate rook attacks with magic bitboards
+        for (int i = 0; i < 64; i++) {
+            int squares[64] = {};
+            int numsquares = 0;
+            U64 temp = rookMagicMask[i];
+
+            while (temp) {
+                U64 lsb = temp & -temp;
+                squares[numsquares++] = LSB(lsb);
+                temp ^= lsb;
+            }
+            for (temp = 0; temp < (U64) 1 << numsquares; temp++) {
+                int j = 0;
+                U64 tempoccupied = init_occupied(squares, numsquares, temp);
+                U64 moves = init_magic_rook(i, tempoccupied);
+                *(pointer[i] + (tempoccupied * rookMagicNum[i] >> rookMagicShift[i])) = moves;
+            }
+        }
+
+        return table;
+    };
+    constexpr std::array<U64, 102400> rookAttacksDB = generateRookAttacksDB();
+
+    constexpr std::array<const U64*, 64> generateBishopAttacks() {
+        std::array<const U64*, 64> table = {};
+        auto data = bishopAttacksDB.data();
+
+        for (int i = 0; i < 64; ++i) {
+            table[i] = data + bishopMagicOffset[i];
+        }
+
+        return table;
+    };
+    constexpr std::array<const U64*, 64> bishopAttacks = generateBishopAttacks();
+
+
+
+    constexpr U64 init_magic_bishop(int square, U64 occupied) {
+        U64 ret = 0;
+        U64 bit = 0;
+        U64 bit2 = 0;
+        U64 rowbits = (U64) 0xFF << (8 * (square / 8));
+
+        bit = (U64) 1 << square;
+        bit2 = bit;
+        do {
+            bit <<= 8 - 1;
+            bit2 >>= 1;
+            if (bit2 & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (bit && !(bit & occupied));
+
+        bit = (U64) 1 << square;
+        bit2 = bit;
+        do {
+            bit <<= 8 + 1;
+            bit2 <<= 1;
+            if (bit2 & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (bit && !(bit & occupied));
+
+        bit = (U64) 1 << square;
+        bit2 = bit;
+        do {
+            bit >>= 8 - 1;
+            bit2 <<= 1;
+            if (bit2 & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (bit && !(bit & occupied));
+
+        bit = (U64) 1 << square;
+        bit2 = bit;
+        do {
+            bit >>= 8 + 1;
+            bit2 >>= 1;
+            if (bit2 & rowbits)
+                ret |= bit;
+            else
+                break;
+        } while (bit && !(bit & occupied));
+
+        return ret;
+    }
+
+    constexpr std::array<U64, 5248> generateBishopAttacksDB() {
+        std::array<U64, 5248> table = {};
+        std::array<U64*, 64> pointer = {};
+
+        for (int i = 0; i < 64; ++i) {
+            pointer[i] = table.data() + bishopMagicOffset[i];
+        }
+
+        for (int i = 0; i < 64; i++) {
+            int squares[64] = {};
+            int numsquares = 0;
+            U64 temp = bishopMagicMask[i];
+
+            while (temp) {
+                U64 lsb = temp & -temp;
+                int sq = LSB(lsb);
+                squares[numsquares++] = sq;
+                temp ^= lsb;
+            }
+            for (temp = 0; temp < (U64) 1 << numsquares; temp++) {
+                U64 moves = 0;
+                U64 tempoccupied = init_occupied(squares, numsquares, temp);
+                moves = init_magic_bishop(i, tempoccupied);
+                *(pointer[i] + (tempoccupied * bishopMagicNum[i] >> bishopMagicShift[i])) = moves;
+            }
+        }
+
+        return table;
+    };
+    constexpr std::array<U64, 5248> bishopAttacksDB = generateBishopAttacksDB();
+
+    constexpr std::array<const U64*, 64> generateBishopAttacks() {
+        std::array<const U64*, 64> table = {};
+        auto data = bishopAttacksDB.data();
+
+        for (int i = 0; i < 64; ++i) {
+            table[i] = data + bishopMagicOffset[i];
+        }
+
+        return table;
+    };
+    constexpr std::array<const U64*, 64> bishopAttacks = generateBishopAttacks();
+
 
     void init();
 
-    U64 init_occupied(int* squares, int numSquares, U64 line_occupied);
-    U64 init_magic_bishop(int square, U64 occupied);
-    U64 init_magic_rook(int square, U64 occupied);
-
-    constexpr U64 getRookAttacks(Square sq, U64 occ)
+    U64 getRookAttacks(Square sq, U64 occ)
     {
         auto occupancy = occ & Magic::rookMagicMask[sq];
         auto index = (occupancy * Magic::rookMagicNum[sq]) >> Magic::rookMagicShift[sq];
@@ -246,7 +391,7 @@ namespace Magic
         return Magic::bishopAttacks[sq][index];
     }
 
-    constexpr U64 getQueenAttacks(Square sq, U64 occ)
+    U64 getQueenAttacks(Square sq, U64 occ)
     {
         return getBishopAttacks(sq, occ) | getRookAttacks(sq, occ);
     }
